@@ -108,14 +108,22 @@ export const addTodo = async (req, res, next) => {
     })
 }
 
-// export const deleteTodo = async (req, res, next) => {
-//     const user = req.user._id
+export const deleteTodo = async (req, res, next) => {
+    const user = req.user.id
 
-//     if (!user) {
-//         return res.status(401).json({
-//             message:"Please login first"
-//         })
-//     }
-
-//     const todo = await Todo.deleteOne({req.todo._id})
-// }
+    if (!user) {
+        return res.status(401).json({
+            message:"Please login first"
+        })
+    }
+    const todoId = req.params.id 
+    
+    const todo = await Todo.findByIdAndDelete({
+        _id: todoId,
+        user:user
+    })
+    
+    return res.status(200).json({
+        message:"Todo Deleted successfully"
+    })
+}
