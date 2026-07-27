@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios"
-import server from "../main"
+import { server } from "../main"
+import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
-    const isAuth  = false
+    const {isAuth} = useAuth()
     const [data, setData] = useState(null)
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -12,27 +13,27 @@ const Home = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [addTodo, setAddTodo] = useState(null)
 
-    useEffect(() => {
-        const getTodos = async () => {
-        try {
-            const {data} = await axios.get(`localhost:3000`,{
-            Headers:{
-                authorizations: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            setData(data)            
-        } catch (error) {
-            setError(error)
-            console.log(error?.message);
+    // useEffect(() => {
+    //     const getTodos = async () => {
+    //     try {
+    //         const {data} = await axios.get(`${server}/todo/get`,{
+    //         Headers:{
+    //             authorizations: `Bearer ${localStorage.getItem("token")}`
+    //             }
+    //         })
+    //         setData(data)            
+    //     } catch (error) {
+    //         setError(error)
+    //         console.log(error?.message);
             
-        }finally{
-            setLoading(false)
-        }
-    }
-    getTodos()
-    },[])
+    //     }finally{
+    //         setLoading(false)
+    //     }
+    // }
+    // getTodos()
+    // },[])
 
-    const addTodoApi = async () => {
+    const addTodoApi = async (title, task) => {
         try {
 
             const {todo} = await axios.post(`${server}/todo/add`,{
