@@ -1,9 +1,12 @@
 import react from "react"
 import { useAuth } from "../context/AuthContext"
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Login from "../pages/Login.jsx"
+
 
 const Navbar = () => {
-    const isAuth = true
-    // const isAuth = useAuth()
+    // const isAuth = true
+    const {isAuth} = useAuth()
 
     return (
         <div className="bg-gray-500 ">
@@ -21,7 +24,13 @@ const Navbar = () => {
                     </div>
                 ): (
                     <div className="flex gap-3">
-                        <h3 className="border border-black rounded px-4 py-1 bg-white">Login</h3>
+                        <BrowserRouter>
+                            <Link to="/login"  className="border border-black rounded px-4 py-1 bg-white">Login</Link> 
+
+                            <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+                        </BrowserRouter>
                         <img className="h-8 w-8" src="./user-icon.png" alt="##" />
 
                     </div>
