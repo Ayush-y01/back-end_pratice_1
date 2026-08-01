@@ -74,9 +74,25 @@ export const login = async (req, res,next) => {
 
 export const profile = async (req, res, next) => {
     return res.status(200).json({
-        message:"Welcome Back",
+        message: "Welcome Back",
         id: req.user._id
     })
+}
+
+export const getTodos = async (req, res, next) => {
+
+    try {
+        const todos = await Todo.find()
+        return res.status(200).json({
+        todos
+    })
+    } catch (error) {
+        console.log(error?.message);
+        return res.status(500).json({
+        message:"unable to fetch todos"
+    })
+    }
+    
 }
 
 export const addTodo = async (req, res, next) => {
