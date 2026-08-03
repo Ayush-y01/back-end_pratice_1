@@ -4,6 +4,7 @@ import {server} from "../main"
 import { FaPen, FaTrash } from "react-icons/fa";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
 import { useAuth } from "../context/AuthContext";
+import { useParams } from "react-router-dom";
 
 const Home = () => {
     const {isAuth} = useAuth()
@@ -15,6 +16,8 @@ const Home = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [addTodo, setAddTodo] = useState(null)
     const [isCheck, setIsCheck ] = useState(false)
+    const [isEditing, setIsEditing] = useState(false);
+    const { id } = useParams()
 
     const handletoggle = () => setIsCheck(!isCheck);    
 
@@ -60,6 +63,50 @@ const Home = () => {
             setLoading(false)
         }
     }
+
+
+    const updateTodo = async () => {
+        
+        try {
+            const {data} = await axios.put(`${server}/todo/edit/:${id}`,{
+                title: title,
+                task:task
+            }, {
+                headers: {
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setData(data)
+            isEditing(false)
+        } catch (error) {
+           console.log(error?.message);
+            setError(error)
+            
+        }finally{
+            setLoading(false)
+        }
+    }
+    
+    const deletTodo = async () => {
+        
+        try {
+            const {data} = await axios.delete(`${server}/todo/edit/:${id}`, {
+                 headers: {
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setData(data)
+            isEditing(false)
+        } catch (error) {
+           console.log(error?.message);
+            setError(error)
+            
+        }finally{
+            setLoading(false)
+        }
+    }
+
+
 
     // const handleSubmit = (e) => {
     //     setTitle(e.target.value)
@@ -113,13 +160,27 @@ const Home = () => {
 
             </div>
                     <h2 className="font-bold bg-white shadow mb-4 text-4xl px-10 py-6 rounded-lg">Todo's</h2>
-                 
-                {todos.map((todo) => 
-                <div key={todo._id} className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
+
+                 {isEditing ? (
+                    <div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
                     <div className="flex justify-between py-2">
-                        <h4>{todo.title}</h4>
-                        <div className="flex gap-4 items-center">
-                            <FaPen className="" />
+                        <p>title</p>
+                        <input type="text" className="bg-gray-100" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    </div>
+                    <p>task</p>
+                    <input type="text" className="bg-gray-100" value={task} onChange={(e) => setTask(e.target.value)} />
+                </div>
+                 ) : (
+                   
+
+<div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
+                    <div className="flex justify-between py-2">
+                        <h4>{title}</h4>
+                        {isEditing ? (
+                                <button className="bg-gray-100" onClick={updateTodo}>Save</button>
+                        ) : (
+                            <div className="flex gap-4 items-center">
+                            <FaPen onClick={() => setIsEditing(true)} className="" />
                             <FaTrash />
                            {isCheck ? (
         <MdCheckBox color="#007bff" />
@@ -127,40 +188,14 @@ const Home = () => {
         <MdCheckBoxOutlineBlank color="#6c757d" />
       )}
                         </div>
+                        )}
                     </div>
                     <p>Task</p>
                 </div>
-                )}
-                <div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
-                    <div className="flex justify-between py-2">
-                        <h4>Title</h4>
-                        <div className="flex gap-4 items-center">
-                            <FaPen className="" />
-                            <FaTrash />
-                           {isCheck ? (
-        <MdCheckBox color="#007bff" />
-      ) : (
-        <MdCheckBoxOutlineBlank color="#6c757d" />
-      )}
-                        </div>
-                    </div>
-                    <p>Task</p>
-                </div>
-                <div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
-                   <div className="flex justify-between py-2">
-                        <h4>Title</h4>
-                        <div className="flex gap-4 items-center">
-                            <FaPen className="" />
-                            <FaTrash />
-                            {isCheck ? (
-        <MdCheckBox color="#007bff" />
-      ) : (
-        <MdCheckBoxOutlineBlank color="#6c757d" />
-      )}
-                        </div>
-                    </div>
-                    <p>Task</p>
-                </div>
+                 ) }
+
+
+                
                 </div>
             </div>
 
@@ -171,3 +206,24 @@ const Home = () => {
 }
 
 export default Home
+
+
+
+
+
+
+{/* <div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
+                    <div className="flex justify-between py-2">
+                        <h4>Title</h4>
+                        <div className="flex gap-4 items-center">
+                            <FaPen className="" />
+                            <FaTrash />
+                           {isCheck ? (
+        <MdCheckBox color="#007bff" />
+      ) : (
+        <MdCheckBoxOutlineBlank color="#6c757d" />
+      )}
+                        </div>
+                    </div>
+                    <p>Task</p>
+                </div> */}
