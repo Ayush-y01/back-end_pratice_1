@@ -3,10 +3,11 @@ import axios from "axios"
 import {server} from "../main"
 import { FaPen, FaTrash } from "react-icons/fa";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
     const {isAuth} = useAuth()
-    const [data, setData] = useState(null)
+    const [data, setData] = useState([])
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
     const [title, setTitle] = useState("")
@@ -15,41 +16,42 @@ const Home = () => {
     const [addTodo, setAddTodo] = useState(null)
     const [isCheck, setIsCheck ] = useState(false)
 
-    const handletoggle = () => setIsCheck(!isCheck);
+    const handletoggle = () => setIsCheck(!isCheck);    
 
-    // useEffect(() => {
-    //     const getTodos = async () => {
-    //     try {
-    //         const {data} = await axios.get(`${server}/todo/get`,{
-    //         Headers:{
-    //             authorizations: `Bearer ${localStorage.getItem("token")}`
-    //             }
-    //         })
-    //         setData(data)            
-    //     } catch (error) {
-    //         setError(error)
-    //         console.log(error?.message);
+    useEffect(() => {
+        const getTodos = async () => {
+        try {
+            const {data} = await axios.get(`${server}/todo/get`,{
+            headers:{
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setData(data.todos)            
+        } catch (error) {
+            setError(error)
+            console.log(error?.message); 
             
-    //     }finally{
-    //         setLoading(false)
-    //     }
-    // }
-    // getTodos()
-    // },[])
+        }finally{
+            setLoading(false)
+        }
+    }
+    getTodos()
+    },[])
 
     const addTodoApi = async (title, task) => {
         try {
 
-            const {todo} = await axios.post(`${server}/todo/add`,{
-                title,
-                task
+            const {data} = await axios.post(`http://localhost:3000/todo/add`,{
+                title:title,
+                task:task
             },{
-                Headers:{
-                    authorizations:`Bearer ${localStorage.getItem("token")}`
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
                 }
             })
-            setData(todo)
+            setData(data.todos)
             isOpen(false)
+            
         } catch (error) {
             console.log(error?.message);
             setError(error)
@@ -100,7 +102,7 @@ const Home = () => {
                         <input type="text" className="bg-white rounded mb-2" value={title} onChange={((e) => setTitle(e.target.value) )} />
                         <label className="px-2">Description</label>
                         <textarea className="bg-white rounded px-4" type="text" value={task} onChange={((e) => setTask(e.target.value))} ></textarea>
-                        <input type="submit" className="ml-66 mt-2 justify-end px-2 bg-blue-500 text-white p-1 rounded" onClick={() => addTodoApi()} />
+                        <input type="submit" className="ml-66 mt-2 justify-end px-2 bg-blue-500 text-white p-1 rounded" onClick={ () => addTodoApi(title, task)} />
                         </div>
                     </div>
                  ):( 
@@ -111,7 +113,24 @@ const Home = () => {
 
             </div>
                     <h2 className="font-bold bg-white shadow mb-4 text-4xl px-10 py-6 rounded-lg">Todo's</h2>
-
+                 
+                {todos.map((todo) => 
+                <div key={todo._id} className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
+                    <div className="flex justify-between py-2">
+                        <h4>{todo.title}</h4>
+                        <div className="flex gap-4 items-center">
+                            <FaPen className="" />
+                            <FaTrash />
+                           {isCheck ? (
+        <MdCheckBox color="#007bff" />
+      ) : (
+        <MdCheckBoxOutlineBlank color="#6c757d" />
+      )}
+                        </div>
+                    </div>
+                    <p>Task</p>
+                </div>
+                )}
                 <div className="px-10 font-semibold mt-1 bg-white shadow py-4 rounded-lg">
                     <div className="flex justify-between py-2">
                         <h4>Title</h4>
