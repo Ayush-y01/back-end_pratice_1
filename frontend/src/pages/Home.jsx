@@ -3,11 +3,12 @@ import axios from "axios"
 import {server} from "../main"
 import { FaPen, FaTrash } from "react-icons/fa";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { useAuth } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
 
 const Home = () => {
     const {isAuth} = useAuth()
-    const [data, setData] = useState(null)
+    const [data, setData] = useState([])
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
     const [title, setTitle] = useState("")
@@ -18,41 +19,42 @@ const Home = () => {
     const [isEditing, setIsEditing] = useState(false);
     const { id } = useParams()
 
-    const handletoggle = () => setIsCheck(!isCheck);
+    const handletoggle = () => setIsCheck(!isCheck);    
 
-    // useEffect(() => {
-    //     const getTodos = async () => {
-    //     try {
-    //         const {data} = await axios.get(`${server}/todo/get`,{
-    //         Headers:{
-    //             authorizations: `Bearer ${localStorage.getItem("token")}`
-    //             }
-    //         })
-    //         setData(data)            
-    //     } catch (error) {
-    //         setError(error)
-    //         console.log(error?.message);
+    useEffect(() => {
+        const getTodos = async () => {
+        try {
+            const {data} = await axios.get(`${server}/todo/get`,{
+            headers:{
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setData(data.todos)            
+        } catch (error) {
+            setError(error)
+            console.log(error?.message); 
             
-    //     }finally{
-    //         setLoading(false)
-    //     }
-    // }
-    // getTodos()
-    // },[])
+        }finally{
+            setLoading(false)
+        }
+    }
+    getTodos()
+    },[])
 
     const addTodoApi = async (title, task) => {
         try {
 
-            const {todo} = await axios.post(`${server}/todo/add`,{
-                title,
-                task
+            const {data} = await axios.post(`http://localhost:3000/todo/add`,{
+                title:title,
+                task:task
             },{
-                Headers:{
-                    authorizations:`Bearer ${localStorage.getItem("token")}`
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
                 }
             })
-            setData(todo)
+            setData(data.todos)
             isOpen(false)
+            
         } catch (error) {
             console.log(error?.message);
             setError(error)
@@ -147,7 +149,7 @@ const Home = () => {
                         <input type="text" className="bg-white rounded mb-2" value={title} onChange={((e) => setTitle(e.target.value) )} />
                         <label className="px-2">Description</label>
                         <textarea className="bg-white rounded px-4" type="text" value={task} onChange={((e) => setTask(e.target.value))} ></textarea>
-                        <input type="submit" className="ml-66 mt-2 justify-end px-2 bg-blue-500 text-white p-1 rounded" onClick={() => addTodoApi()} />
+                        <input type="submit" className="ml-66 mt-2 justify-end px-2 bg-blue-500 text-white p-1 rounded" onClick={ () => addTodoApi(title, task)} />
                         </div>
                     </div>
                  ):( 
