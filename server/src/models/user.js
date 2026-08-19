@@ -19,11 +19,11 @@ const user = new mongoose.Schema({
     phone:{
         type:Number,
         required:true,
-        select:false
     },
     password:{
         type:String,
-        required:true
+        required:true,
+        select:false
     },
     role:{
         type:String,
